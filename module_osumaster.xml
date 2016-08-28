@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="module_osumaster" default="compile.module.osumaster">
+  <dirname property="module.osumaster.basedir" file="${ant.file.module_osumaster}"/>
+  
+  <property name="module.jdk.home.osumaster" value="${project.jdk.home}"/>
+  <property name="module.jdk.bin.osumaster" value="${project.jdk.bin}"/>
+  <property name="module.jdk.classpath.osumaster" value="${project.jdk.classpath}"/>
+  
+  <property name="compiler.args.osumaster" value="-encoding UTF-8 -source 8 -target 8 ${compiler.args}"/>
+  
+  <property name="osumaster.output.dir" value="${module.osumaster.basedir}/out/production/OsuMaster"/>
+  <property name="osumaster.testoutput.dir" value="${module.osumaster.basedir}/out/test/OsuMaster"/>
+  
+  <path id="osumaster.module.bootclasspath">
+    <!-- Paths to be included in compilation bootclasspath -->
+  </path>
+  
+  <path id="osumaster.module.production.classpath">
+    <path refid="${module.jdk.classpath.osumaster}"/>
+    <pathelement location="${basedir}/lib/commons-io-2.5.jar"/>
+    <pathelement location="${basedir}/lib/commons-logging-1.2.jar"/>
+    <pathelement location="${basedir}/lib/gson-2.6.2.jar"/>
+    <pathelement location="${basedir}/lib/httpclient-4.5.2.jar"/>
+    <pathelement location="${basedir}/lib/httpcore-4.4.4.jar"/>
+    <pathelement location="${basedir}/lib/json.jar"/>
+  </path>
+  
+  <path id="osumaster.runtime.production.module.classpath">
+    <pathelement location="${osumaster.output.dir}"/>
+    <pathelement location="${basedir}/lib/commons-io-2.5.jar"/>
+    <pathelement location="${basedir}/lib/commons-logging-1.2.jar"/>
+    <pathelement location="${basedir}/lib/gson-2.6.2.jar"/>
+    <pathelement location="${basedir}/lib/httpclient-4.5.2.jar"/>
+    <pathelement location="${basedir}/lib/httpcore-4.4.4.jar"/>
+    <pathelement location="${basedir}/lib/json.jar"/>
+  </path>
+  
+  <path id="osumaster.module.classpath">
+    <path refid="${module.jdk.classpath.osumaster}"/>
+    <pathelement location="${osumaster.output.dir}"/>
+    <pathelement location="${basedir}/lib/commons-io-2.5.jar"/>
+    <pathelement location="${basedir}/lib/commons-logging-1.2.jar"/>
+    <pathelement location="${basedir}/lib/gson-2.6.2.jar"/>
+    <pathelement location="${basedir}/lib/httpclient-4.5.2.jar"/>
+    <pathelement location="${basedir}/lib/httpcore-4.4.4.jar"/>
+    <pathelement location="${basedir}/lib/json.jar"/>
+  </path>
+  
+  <path id="osumaster.runtime.module.classpath">
+    <pathelement location="${osumaster.testoutput.dir}"/>
+    <pathelement location="${osumaster.output.dir}"/>
+    <pathelement location="${basedir}/lib/commons-io-2.5.jar"/>
+    <pathelement location="${basedir}/lib/commons-logging-1.2.jar"/>
+    <pathelement location="${basedir}/lib/gson-2.6.2.jar"/>
+    <pathelement location="${basedir}/lib/httpclient-4.5.2.jar"/>
+    <pathelement location="${basedir}/lib/httpcore-4.4.4.jar"/>
+    <pathelement location="${basedir}/lib/json.jar"/>
+  </path>
+  
+  
+  <patternset id="excluded.from.module.osumaster">
+    <patternset refid="ignored.files"/>
+  </patternset>
+  
+  <patternset id="excluded.from.compilation.osumaster">
+    <patternset refid="excluded.from.module.osumaster"/>
+  </patternset>
+  
+  <path id="osumaster.module.sourcepath">
+    <dirset dir="${module.osumaster.basedir}">
+      <include name="src"/>
+    </dirset>
+  </path>
+  
+  
+  <target name="compile.module.osumaster" depends="compile.module.osumaster.production,compile.module.osumaster.tests" description="Compile module OsuMaster"/>
+  
+  <target name="compile.module.osumaster.production" depends="register.custom.compilers" description="Compile module OsuMaster; production classes">
+    <mkdir dir="${osumaster.output.dir}"/>
+    <javac2 destdir="${osumaster.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.osumaster}/javac">
+      <compilerarg line="${compiler.args.osumaster}"/>
+      <bootclasspath refid="osumaster.module.bootclasspath"/>
+      <classpath refid="osumaster.module.production.classpath"/>
+      <src refid="osumaster.module.sourcepath"/>
+      <patternset refid="excluded.from.compilation.osumaster"/>
+    </javac2>
+    
+    <copy todir="${osumaster.output.dir}">
+      <fileset dir="${module.osumaster.basedir}/src">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+    </copy>
+  </target>
+  
+  <target name="compile.module.osumaster.tests" depends="register.custom.compilers,compile.module.osumaster.production" description="compile module OsuMaster; test classes" unless="skip.tests"/>
+  
+  <target name="clean.module.osumaster" description="cleanup module">
+    <delete dir="${osumaster.output.dir}"/>
+    <delete dir="${osumaster.testoutput.dir}"/>
+  </target>
+</project>
