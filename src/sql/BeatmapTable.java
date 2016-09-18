@@ -71,15 +71,16 @@ public class BeatmapTable {
                     " BPM, CREATOR, DIFFICULTYRATING, DIFF_SIZE, DIFF_OVERALL, DIFF_APPROACH, DIFF_DRAIN, HIT_LENGTH, " +
                     "GENRE_ID, LANGUAGE_ID, TITLE, TOTAL_LENGTH, VERSION, FILE_MD5, MODE, FAVOURITE_COUNT, PLAYCOUNT, " +
                     "PASSCOUNT, MAX_COMBO) " +
-                    "VALUES (" + Integer.valueOf(beatmapInfo.getApproved()) + ",'" +
-                    beatmapInfo.getApproved_date() + "','" + beatmapInfo.getLast_update() + "','" + beatmapInfo.getArtist() + "'," +
-                    Integer.valueOf(beatmapInfo.getBeatmap_id()) + "," + Integer.valueOf(beatmapInfo.getBeatmapset_id()) + "," + Integer.valueOf(beatmapInfo.getBpm()) + ",'" +
-                    beatmapInfo.getCreator() + "'," + Double.valueOf(beatmapInfo.getDifficultyrating()) + "," + Integer.valueOf(beatmapInfo.getDiff_size()) + "," +
+                    "VALUES (" + Integer.valueOf(beatmapInfo.getApproved()) + ",\"" +
+                    beatmapInfo.getApproved_date() + "\",\"" + beatmapInfo.getLast_update() + "\",\"" + beatmapInfo.getArtist() + "\"," +
+                    Integer.valueOf(beatmapInfo.getBeatmap_id()) + "," + Integer.valueOf(beatmapInfo.getBeatmapset_id()) + "," + Integer.valueOf(beatmapInfo.getBpm()) + ",\"" +
+                    beatmapInfo.getCreator() + "\"," + Double.valueOf(beatmapInfo.getDifficultyrating()) + "," + Integer.valueOf(beatmapInfo.getDiff_size()) + "," +
                     Integer.valueOf(beatmapInfo.getDiff_overall()) + "," + Integer.valueOf(beatmapInfo.getDiff_approach()) + "," + Integer.valueOf(beatmapInfo.getDiff_drain()) + "," +
-                    Integer.valueOf(beatmapInfo.getHit_length()) + "," + Integer.valueOf(beatmapInfo.getGenre_id()) + "," + Integer.valueOf(beatmapInfo.getLanguage_id()) + ",'" +
-                    beatmapInfo.getTitle() + "'," + Integer.valueOf(beatmapInfo.getTotal_length()) + ",'" + beatmapInfo.getVersion() + "','" +
-                    beatmapInfo.getFile_md5() + "'," + Integer.valueOf(beatmapInfo.getMode()) + "," + Integer.valueOf(beatmapInfo.getFavourite_count()) + "," +
+                    Integer.valueOf(beatmapInfo.getHit_length()) + "," + Integer.valueOf(beatmapInfo.getGenre_id()) + "," + Integer.valueOf(beatmapInfo.getLanguage_id()) + ",\"" +
+                    beatmapInfo.getTitle() + "\"," + Integer.valueOf(beatmapInfo.getTotal_length()) + ",\"" + beatmapInfo.getVersion() + "\",\"" +
+                    beatmapInfo.getFile_md5() + "\"," + Integer.valueOf(beatmapInfo.getMode()) + "," + Integer.valueOf(beatmapInfo.getFavourite_count()) + "," +
                     Integer.valueOf(beatmapInfo.getPlaycount()) + "," + Integer.valueOf(beatmapInfo.getPasscount()) + "," + Integer.valueOf(beatmapInfo.getMax_combo()) + ");";
+
             System.out.println(sql);
             statement.executeUpdate(sql);
             statement.close();
