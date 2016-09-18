@@ -18,15 +18,23 @@ import ui.OsuMasterApplication.Pair;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Objects;
 
 import static bean.ScoreBean.ScoresBeanInfo;
 import static bean.ScoreBean.generateList;
 
 /**
  * Created by Bovink on 2016/5/7 0007.
+ * 网络处理
  */
 public class Http {
+    /**
+     * 血猫下载地址前缀
+     */
     private String path = "http://bloodcat.com/osu/s/";
+    /**
+     * 下载目录路径
+     */
     private String downloadPath = "G:/Project/IdeaProjects/buffer";
 
     //打印此次遍历开始时间和剩余需要检测的beatmap数量
@@ -50,31 +58,35 @@ public class Http {
     private String minPP = "190";
     private OnGetScoreListener listener;
 
-    // PP区间，以10为边界值
+    /**
+     * PP对值，前后差值为10
+     */
     private ArrayList<Pair> pairs = new ArrayList<>();
 
-    //Integer为pairs中的index，ArrayList<String>为对应的收藏夹图
+    /**
+     * Integer为pairs
+     *
+     */
     private HashMap<Integer, ArrayList<String>> collections = new HashMap<>();
 
+    /**
+     * 判断是否超过日期
+     * @param time
+     */
     private void judgeExpiry(String time) {
         String year = time.substring(0, 4);
         String month = time.substring(5, 7);
-        if (Integer.valueOf(month) != Integer.valueOf(endTime)) {
+        if (!Objects.equals(Integer.valueOf(month), Integer.valueOf(endTime))) {
             System.out.println(startTime);
             continueGet = false;
         }
 
     }
 
-    public void setPairs(ArrayList<Pair> pairs) {
-        this.pairs = pairs;
-    }
 
-    public HashMap<Integer, ArrayList<String>> getCollections() {
-        return collections;
-    }
-
-    // 初始化hashmap
+    /**
+     * 初始化Collections
+     */
     public void initCollections() {
         for (int i = 0; i < pairs.size(); i++) {
             ArrayList<String> strings = new ArrayList<>();
@@ -84,9 +96,6 @@ public class Http {
 
     }
 
-    public ArrayList<String> getTargetMd5() {
-        return targetMd5;
-    }
 
     /**
      * 获取从开始时间起一定数量的beatmap
@@ -119,6 +128,9 @@ public class Http {
         }
     }
 
+    /**
+     * 输出下载地址
+     */
     private void outputTarget() {
         File file = new File(downloadPath + "/" + startTime.substring(0, 4) + endTime + ".txt");
 
@@ -135,10 +147,10 @@ public class Http {
 
     }
 
-    public interface OnGetScoreListener {
-        void getScore(String rest);
-    }
 
+    /**
+     * 获取分数
+     */
     private void getScore() {
         if (index > beatmapIdList.size() - 1) {
 //            continueGet = false;
@@ -199,6 +211,7 @@ public class Http {
             // 循环pairs，找到满足条件的区间
             for (int i = 0; i < pairs.size(); i++) {
                 if (max >= pairs.get(i).getFirst() && max < pairs.get(i).getSecond()) {
+                    target.add(path + beatmapSetIdList.get(index));
                     ArrayList<String> md5s = collections.get(i);
                     md5s.add(beatmapMd5List.get(index));
 
@@ -213,7 +226,11 @@ public class Http {
         }
     }
 
-
+    /**
+     * 处理网络请求，获取字符串
+     * @param url
+     * @return
+     */
     private String httpGet(String url) {
         CloseableHttpClient httpClient = HttpClients.createDefault();
         HttpGet httpGet = new HttpGet(url);
@@ -266,6 +283,25 @@ public class Http {
 
     public void setListener(OnGetScoreListener listener) {
         this.listener = listener;
+    }
+
+    public void setPairs(ArrayList<Pair> pairs) {
+        this.pairs = pairs;
+    }
+
+    public HashMap<Integer, ArrayList<String>> getCollections() {
+        return collections;
+    }
+
+    public ArrayList<String> getTargetMd5() {
+        return targetMd5;
+    }
+
+    /**
+     * 外部接口
+     */
+    public interface OnGetScoreListener {
+        void getScore(String rest);
     }
 }
 
