@@ -274,8 +274,6 @@ public class OsuMasterApplication extends Application {
                     http.setMods(mods[mod.getSelectionModel().getSelectedIndex()]);
                     http.setStartTime(datePicker.getText());
 //                        http.setEndTime(findString(END_TIME));
-                    http.setMaxPP(maxpp.getText());
-                    http.setMinPP(minpp.getText());
 
                     http.setListener(new Http.OnGetScoreListener() {
                         @Override

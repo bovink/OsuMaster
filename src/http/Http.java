@@ -29,33 +29,50 @@ import static bean.ScoreBean.generateList;
  */
 public class Http {
     /**
-     * 血猫下载地址前缀
-     */
-    private String path = "http://bloodcat.com/osu/s/";
-    /**
-     * 下载目录路径
+     * beatmap下载地址文件储存路径
      */
     private String downloadPath = "G:/Project/IdeaProjects/buffer";
-
-    //打印此次遍历开始时间和剩余需要检测的beatmap数量
+    /**
+     * 一次遍历中符合条件的beatmap_id 列表
+     */
     private ArrayList<String> beatmapIdList = new ArrayList<>();
+    /**
+     * 一次遍历中符合条件的beatmapset_id 列表
+     */
     private ArrayList<String> beatmapSetIdList = new ArrayList<>();
-    private ArrayList<String> beatmapMd5List = new ArrayList<>();
-    // 最终输出
-    private ArrayList<String> targetMd5 = new ArrayList<>();
+    /**
+     * 一次遍历中符合条件的file_md5 列表
+     */
+    private ArrayList<String> fileMD5List = new ArrayList<>();
+    /**
+     * beatmap下载地址String列表
+     */
     private ArrayList<String> target = new ArrayList<>();
 
+    /**
+     * 记录当前查询的beatmap的索引
+     */
     private int index = 0;
+    /**
+     * 记录当前查询的beatmap的总数
+     */
     private int currentTotal;
+    /**
+     * 是否继续查询beatmap，flag
+     */
     private boolean continueGet = true;
 
     //    private String startTime = "2015-01-01-00:00:00";
+    /**
+     * 遍历开始时间
+     */
     private String startTime = "2009-02-01-00:00:17";
+    /**
+     * 遍历结束时间
+     */
     private String endTime = startTime.substring(5, 7);
 
     private String mods = "0";
-    private String maxPP = "200";
-    private String minPP = "190";
     private OnGetScoreListener listener;
 
     /**
@@ -65,13 +82,13 @@ public class Http {
 
     /**
      * Integer为pairs
-     *
      */
     private HashMap<Integer, ArrayList<String>> collections = new HashMap<>();
 
     /**
      * 判断是否超过日期
-     * @param time
+     *
+     * @param time 指定时间
      */
     private void judgeExpiry(String time) {
         String year = time.substring(0, 4);
@@ -89,11 +106,8 @@ public class Http {
      */
     public void initCollections() {
         for (int i = 0; i < pairs.size(); i++) {
-            ArrayList<String> strings = new ArrayList<>();
-            collections.put(i, strings);
-
+            collections.put(i, new ArrayList<>());
         }
-
     }
 
 
@@ -109,10 +123,10 @@ public class Http {
         try {
             list = BeatmapBean.generateList(result);
             // 储存beatmap id
-            for (int i = 0; i < list.size(); i++) {
-                beatmapIdList.add(list.get(i).getBeatmap_id());
-                beatmapSetIdList.add(list.get(i).getBeatmapset_id());
-                beatmapMd5List.add(list.get(i).getFile_md5());
+            for (BeatmapBeanInfo aList : list) {
+                beatmapIdList.add(aList.getBeatmap_id());
+                beatmapSetIdList.add(aList.getBeatmapset_id());
+                fileMD5List.add(aList.getFile_md5());
             }
 
             currentTotal = beatmapIdList.size();
@@ -134,9 +148,9 @@ public class Http {
     private void outputTarget() {
         File file = new File(downloadPath + "/" + startTime.substring(0, 4) + endTime + ".txt");
 
-        StringBuffer sb = new StringBuffer();
-        for (int i = 0; i < target.size(); i++) {
-            sb.append(target.get(i));
+        StringBuilder sb = new StringBuilder();
+        for (String aTarget : target) {
+            sb.append(aTarget);
             sb.append("\r\n");
         }
         try {
@@ -159,7 +173,7 @@ public class Http {
                 index = 0;
                 beatmapIdList.clear();
                 beatmapSetIdList.clear();
-                beatmapMd5List.clear();
+                fileMD5List.clear();
                 getBeatmap();
             } else {
                 outputTarget();
@@ -203,17 +217,14 @@ public class Http {
                     }
                 }
             }
-            // 找出最大PP值在130与140之间的
-//            if (max >= Integer.valueOf(minPP) && max < Integer.valueOf(maxPP)) {
-//                target.add(path + beatmapSetIdList.get(index));
-//                targetMd5.add(beatmapMd5List.get(index));
-//            }
             // 循环pairs，找到满足条件的区间
             for (int i = 0; i < pairs.size(); i++) {
                 if (max >= pairs.get(i).getFirst() && max < pairs.get(i).getSecond()) {
-                    target.add(path + beatmapSetIdList.get(index));
+                    // 血猫下载地址前缀
+                    String prefix = "http://bloodcat.com/osu/s/";
+                    target.add(prefix + beatmapSetIdList.get(index));
                     ArrayList<String> md5s = collections.get(i);
-                    md5s.add(beatmapMd5List.get(index));
+                    md5s.add(fileMD5List.get(index));
 
                     break;
                 }
@@ -228,8 +239,9 @@ public class Http {
 
     /**
      * 处理网络请求，获取字符串
-     * @param url
-     * @return
+     *
+     * @param url 地址
+     * @return json数据
      */
     private String httpGet(String url) {
         CloseableHttpClient httpClient = HttpClients.createDefault();
@@ -243,7 +255,6 @@ public class Http {
                 while ((line = bReader.readLine()) != null) {
                     return line;
                 }
-
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -269,14 +280,6 @@ public class Http {
         this.mods = mods;
     }
 
-    public void setMaxPP(String maxPP) {
-        this.maxPP = maxPP;
-    }
-
-    public void setMinPP(String minPP) {
-        this.minPP = minPP;
-    }
-
     public String getStartTime() {
         return startTime;
     }
@@ -291,10 +294,6 @@ public class Http {
 
     public HashMap<Integer, ArrayList<String>> getCollections() {
         return collections;
-    }
-
-    public ArrayList<String> getTargetMd5() {
-        return targetMd5;
     }
 
     /**
