@@ -10,6 +10,7 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import sql.BeatmapTable;
 import org.json.JSONException;
 import sun.audio.AudioPlayer;
 import sun.audio.AudioStream;
@@ -124,6 +125,7 @@ public class Http {
             list = BeatmapBean.generateList(result);
             // 储存beatmap id
             for (BeatmapBeanInfo aList : list) {
+                BeatmapTable.insertData(aList);
                 beatmapIdList.add(aList.getBeatmap_id());
                 beatmapSetIdList.add(aList.getBeatmapset_id());
                 fileMD5List.add(aList.getFile_md5());
