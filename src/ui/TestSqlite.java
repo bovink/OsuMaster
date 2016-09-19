@@ -18,13 +18,15 @@ public class TestSqlite {
 //        BeatmapTable.queryBeatmap(10000000);
 //        BeatmapTable.deleteBeatmap(54899);
 
-        String startTime = "2009-01-01-00:00:00";
+        String startTime = "2007-10-01-00:00:00";
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd-HH:mm:ss", Locale.CHINA);
         try {
             Date date = sdf.parse(startTime);
             GregorianCalendar calendar = new GregorianCalendar();
             calendar.setTime(date);
-            while (calendar.get(Calendar.YEAR)  != 2016){
+            printDate(calendar);
+            // 当不是2016年时或者是2016年但不是9月份时
+            while (calendar.get(Calendar.YEAR) != 2016 ||  calendar.get(Calendar.MONTH) + 1 != 9) {
                 calendar.add(Calendar.MONTH, 1);
                 printDate(calendar);
             }
@@ -36,14 +38,10 @@ public class TestSqlite {
     }
 
     private static void printDate(GregorianCalendar calendar) {
-//        System.out.println("year:" + calendar.get(Calendar.YEAR));
-//        System.out.println("month:" + calendar.get(Calendar.MONTH));
-//        System.out.println("day:" + calendar.get(Calendar.DAY_OF_MONTH));
         Date date = calendar.getTime();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd-HH:mm:ss", Locale.CHINA);
         String time = sdf.format(date);
         System.out.println("time:" + time);
-
     }
 
 
