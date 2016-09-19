@@ -125,7 +125,9 @@ public class Http {
             list = BeatmapBean.generateList(result);
             // 储存beatmap id
             for (BeatmapBeanInfo aList : list) {
-                BeatmapTable.insertData(aList);
+                InsertRunnable insertRunnable = new InsertRunnable(aList);
+                Thread thread = new Thread(insertRunnable);
+                thread.start();
                 beatmapIdList.add(aList.getBeatmap_id());
                 beatmapSetIdList.add(aList.getBeatmapset_id());
                 fileMD5List.add(aList.getFile_md5());
@@ -141,6 +143,19 @@ public class Http {
             getScore();
         } catch (JSONException e) {
             e.printStackTrace();
+        }
+    }
+
+    private class InsertRunnable implements Runnable {
+        BeatmapBeanInfo beatmapBeanInfo;
+
+        public InsertRunnable(BeatmapBeanInfo beatmapBeanInfo) {
+            this.beatmapBeanInfo = beatmapBeanInfo;
+        }
+
+        @Override
+        public void run() {
+            BeatmapTable.insertData(beatmapBeanInfo);
         }
     }
 
