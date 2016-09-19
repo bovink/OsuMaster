@@ -34,13 +34,13 @@ public class BeatmapTable {
                         "ARTIST VARCHAR(50)," +
                         "BEATMAP_ID INTEGER," +
                         "BEATMAPSET_ID INTEGER," +
-                        "BPM INTEGER," +
+                        "BPM REAL," +
                         "CREATOR VARCHAR(30)," +
                         "DIFFICULTYRATING REAL," +
-                        "DIFF_SIZE INTEGER," +
-                        "DIFF_OVERALL INTEGER," +
-                        "DIFF_APPROACH INTEGER," +
-                        "DIFF_DRAIN INTEGER," +
+                        "DIFF_SIZE REAL," +
+                        "DIFF_OVERALL REAL," +
+                        "DIFF_APPROACH REAL," +
+                        "DIFF_DRAIN REAL," +
                         "HIT_LENGTH INTEGER," +
                         "GENRE_ID INTEGER," +
                         "LANGUAGE_ID INTEGER," +
@@ -69,30 +69,44 @@ public class BeatmapTable {
      *
      * @param beatmapInfo
      */
-    public static void insertBeatmap(BeatmapBean.BeatmapBeanInfo beatmapInfo) {
-        Connection connection = getConnection();
+    public static void insertBeatmap(Connection connection, BeatmapBean.BeatmapBeanInfo beatmapInfo) {
         Statement statement;
+
+        String artist = beatmapInfo.getArtist();
+        String creator = beatmapInfo.getCreator();
+        String title = beatmapInfo.getTitle();
+        String version = beatmapInfo.getVersion();
+        String maxCombo = beatmapInfo.getMax_combo();
+        if (maxCombo == null) {
+            maxCombo = "0";
+        }
+        artist = artist.replace("\"", "\'");
+        creator = creator.replace("\"", "\'");
+        title = title.replace("\"", "\'");
+        version = version.replace("\"", "\'");
+
+
+        String sql = "INSERT INTO BEATMAP (APPROVED, APPROVED_DATE, LAST_UPDATE, ARTIST, BEATMAP_ID, BEATMAPSET_ID," +
+                " BPM, CREATOR, DIFFICULTYRATING, DIFF_SIZE, DIFF_OVERALL, DIFF_APPROACH, DIFF_DRAIN, HIT_LENGTH, " +
+                "GENRE_ID, LANGUAGE_ID, TITLE, TOTAL_LENGTH, VERSION, FILE_MD5, MODE, FAVOURITE_COUNT, PLAYCOUNT, " +
+                "PASSCOUNT, MAX_COMBO) " +
+                "VALUES (" + Integer.valueOf(beatmapInfo.getApproved()) + ",\"" +
+                beatmapInfo.getApproved_date() + "\",\"" + beatmapInfo.getLast_update() + "\",\"" + artist + "\"," +
+                Integer.valueOf(beatmapInfo.getBeatmap_id()) + "," + Integer.valueOf(beatmapInfo.getBeatmapset_id()) + "," + Double.valueOf(beatmapInfo.getBpm()) + ",\"" +
+                creator + "\"," + Double.valueOf(beatmapInfo.getDifficultyrating()) + "," + Double.valueOf(beatmapInfo.getDiff_size()) + "," +
+                Double.valueOf(beatmapInfo.getDiff_overall()) + "," + Double.valueOf(beatmapInfo.getDiff_approach()) + "," + Double.valueOf(beatmapInfo.getDiff_drain()) + "," +
+                Integer.valueOf(beatmapInfo.getHit_length()) + "," + Integer.valueOf(beatmapInfo.getGenre_id()) + "," + Integer.valueOf(beatmapInfo.getLanguage_id()) + ",\"" +
+                title + "\"," + Integer.valueOf(beatmapInfo.getTotal_length()) + ",\"" + version + "\",\"" +
+                beatmapInfo.getFile_md5() + "\"," + Integer.valueOf(beatmapInfo.getMode()) + "," + Integer.valueOf(beatmapInfo.getFavourite_count()) + "," +
+                Integer.valueOf(beatmapInfo.getPlaycount()) + "," + Integer.valueOf(beatmapInfo.getPasscount()) + "," + maxCombo + ");";
         try {
             statement = connection.createStatement();
-            String sql = "INSERT INTO BEATMAP (APPROVED, APPROVED_DATE, LAST_UPDATE, ARTIST, BEATMAP_ID, BEATMAPSET_ID," +
-                    " BPM, CREATOR, DIFFICULTYRATING, DIFF_SIZE, DIFF_OVERALL, DIFF_APPROACH, DIFF_DRAIN, HIT_LENGTH, " +
-                    "GENRE_ID, LANGUAGE_ID, TITLE, TOTAL_LENGTH, VERSION, FILE_MD5, MODE, FAVOURITE_COUNT, PLAYCOUNT, " +
-                    "PASSCOUNT, MAX_COMBO) " +
-                    "VALUES (" + Integer.valueOf(beatmapInfo.getApproved()) + ",\"" +
-                    beatmapInfo.getApproved_date() + "\",\"" + beatmapInfo.getLast_update() + "\",\"" + beatmapInfo.getArtist() + "\"," +
-                    Integer.valueOf(beatmapInfo.getBeatmap_id()) + "," + Integer.valueOf(beatmapInfo.getBeatmapset_id()) + "," + Double.valueOf(beatmapInfo.getBpm()) + ",\"" +
-                    beatmapInfo.getCreator() + "\"," + Double.valueOf(beatmapInfo.getDifficultyrating()) + "," + Integer.valueOf(beatmapInfo.getDiff_size()) + "," +
-                    Integer.valueOf(beatmapInfo.getDiff_overall()) + "," + Integer.valueOf(beatmapInfo.getDiff_approach()) + "," + Integer.valueOf(beatmapInfo.getDiff_drain()) + "," +
-                    Integer.valueOf(beatmapInfo.getHit_length()) + "," + Integer.valueOf(beatmapInfo.getGenre_id()) + "," + Integer.valueOf(beatmapInfo.getLanguage_id()) + ",\"" +
-                    beatmapInfo.getTitle() + "\"," + Integer.valueOf(beatmapInfo.getTotal_length()) + ",\"" + beatmapInfo.getVersion() + "\",\"" +
-                    beatmapInfo.getFile_md5() + "\"," + Integer.valueOf(beatmapInfo.getMode()) + "," + Integer.valueOf(beatmapInfo.getFavourite_count()) + "," +
-                    Integer.valueOf(beatmapInfo.getPlaycount()) + "," + Integer.valueOf(beatmapInfo.getPasscount()) + "," + Integer.valueOf(beatmapInfo.getMax_combo()) + ");";
             statement.executeUpdate(sql);
-            System.out.println("插入数据:" + sql);
 
             statement.close();
-            connection.close();
+//            connection.close();
         } catch (SQLException e) {
+            System.out.println("插入数据:" + sql);
             e.printStackTrace();
         }
     }
@@ -103,8 +117,7 @@ public class BeatmapTable {
      * @param beatmapId 指定id
      * @return 是否存在
      */
-    public static boolean queryBeatmap(int beatmapId) {
-        Connection connection = getConnection();
+    public static boolean queryBeatmap(Connection connection, int beatmapId) {
         Statement statement;
 
         try {
@@ -118,7 +131,7 @@ public class BeatmapTable {
 
             resultSet.close();
             statement.close();
-            connection.close();
+//            connection.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -166,5 +179,4 @@ public class BeatmapTable {
             e.printStackTrace();
         }
     }
-
 }
