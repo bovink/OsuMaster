@@ -73,7 +73,7 @@ public class BeatmapTable {
                     "PASSCOUNT, MAX_COMBO) " +
                     "VALUES (" + Integer.valueOf(beatmapInfo.getApproved()) + ",\"" +
                     beatmapInfo.getApproved_date() + "\",\"" + beatmapInfo.getLast_update() + "\",\"" + beatmapInfo.getArtist() + "\"," +
-                    Integer.valueOf(beatmapInfo.getBeatmap_id()) + "," + Integer.valueOf(beatmapInfo.getBeatmapset_id()) + "," + Integer.valueOf(beatmapInfo.getBpm()) + ",\"" +
+                    Integer.valueOf(beatmapInfo.getBeatmap_id()) + "," + Integer.valueOf(beatmapInfo.getBeatmapset_id()) + "," + Double.valueOf(beatmapInfo.getBpm()) + ",\"" +
                     beatmapInfo.getCreator() + "\"," + Double.valueOf(beatmapInfo.getDifficultyrating()) + "," + Integer.valueOf(beatmapInfo.getDiff_size()) + "," +
                     Integer.valueOf(beatmapInfo.getDiff_overall()) + "," + Integer.valueOf(beatmapInfo.getDiff_approach()) + "," + Integer.valueOf(beatmapInfo.getDiff_drain()) + "," +
                     Integer.valueOf(beatmapInfo.getHit_length()) + "," + Integer.valueOf(beatmapInfo.getGenre_id()) + "," + Integer.valueOf(beatmapInfo.getLanguage_id()) + ",\"" +
