@@ -1,4 +1,4 @@
-package sql;
+package database;
 
 import bean.BeatmapBean;
 
@@ -23,10 +23,10 @@ public class BeatmapTable {
         Statement statement;
         try {
             statement = connection.createStatement();
-            String sql = "SELECT * FROM sqlite_master WHERE type='table' AND name = 'BEATMAPS'";
+            String sql = "SELECT * FROM sqlite_master WHERE type='table' AND name = 'BEATMAP'";
             ResultSet resultSet = statement.executeQuery(sql);
             if (!resultSet.next()) {
-                sql = "CREATE TABLE BEATMAPS" +
+                sql = "CREATE TABLE BEATMAP" +
                         "(ID INTEGER PRIMARY KEY AUTOINCREMENT," +
                         "APPROVED INTEGER," +
                         "APPROVED_DATE CHAR(19)," +
@@ -74,7 +74,7 @@ public class BeatmapTable {
         Statement statement;
         try {
             statement = connection.createStatement();
-            String sql = "INSERT INTO BEATMAPS (APPROVED, APPROVED_DATE, LAST_UPDATE, ARTIST, BEATMAP_ID, BEATMAPSET_ID," +
+            String sql = "INSERT INTO BEATMAP (APPROVED, APPROVED_DATE, LAST_UPDATE, ARTIST, BEATMAP_ID, BEATMAPSET_ID," +
                     " BPM, CREATOR, DIFFICULTYRATING, DIFF_SIZE, DIFF_OVERALL, DIFF_APPROACH, DIFF_DRAIN, HIT_LENGTH, " +
                     "GENRE_ID, LANGUAGE_ID, TITLE, TOTAL_LENGTH, VERSION, FILE_MD5, MODE, FAVOURITE_COUNT, PLAYCOUNT, " +
                     "PASSCOUNT, MAX_COMBO) " +
@@ -88,6 +88,7 @@ public class BeatmapTable {
                     beatmapInfo.getFile_md5() + "\"," + Integer.valueOf(beatmapInfo.getMode()) + "," + Integer.valueOf(beatmapInfo.getFavourite_count()) + "," +
                     Integer.valueOf(beatmapInfo.getPlaycount()) + "," + Integer.valueOf(beatmapInfo.getPasscount()) + "," + Integer.valueOf(beatmapInfo.getMax_combo()) + ");";
             statement.executeUpdate(sql);
+            System.out.println("插入数据:" + sql);
 
             statement.close();
             connection.close();
@@ -109,14 +110,10 @@ public class BeatmapTable {
         try {
             statement = connection.createStatement();
 
-            String sql = "SELECT * FROM BEATMAPS WHERE BEATMAP_ID = " + beatmapId;
+            String sql = "SELECT * FROM BEATMAP WHERE BEATMAP_ID = " + beatmapId;
             ResultSet resultSet = statement.executeQuery(sql);
             if (resultSet.next()) {
-                System.out.println("TITLE =\t\t\t\t" + resultSet.getString("title"));
-                System.out.println("ARTIST=\t\t\t\t" + resultSet.getString("artist"));
                 return true;
-            } else {
-                System.out.println("不存在该数据");
             }
 
             resultSet.close();
@@ -140,7 +137,7 @@ public class BeatmapTable {
         Statement statement;
         try {
             statement = connection.createStatement();
-            String sql = "UPDATE BEATMAPS SET APPROVED = " + approved + " WHERE BEATMAP_ID = " + beatmapId;
+            String sql = "UPDATE BEATMAP SET APPROVED = " + approved + " WHERE BEATMAP_ID = " + beatmapId;
             statement.executeUpdate(sql);
 
             statement.close();
@@ -152,6 +149,7 @@ public class BeatmapTable {
 
     /**
      * 删除beatmapId为指定id的beatmap
+     *
      * @param beatmapId 指定id
      */
     public static void deleteBeatmap(int beatmapId) {
@@ -159,7 +157,7 @@ public class BeatmapTable {
         Statement statement;
         try {
             statement = connection.createStatement();
-            String sql = "DELETE FROM BEATMAPS WHERE BEATMAP_ID = " + beatmapId;
+            String sql = "DELETE FROM BEATMAP WHERE BEATMAP_ID = " + beatmapId;
             statement.executeUpdate(sql);
 
             statement.close();

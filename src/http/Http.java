@@ -10,7 +10,6 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
-import sql.BeatmapTable;
 import org.json.JSONException;
 import sun.audio.AudioPlayer;
 import sun.audio.AudioStream;
@@ -125,9 +124,6 @@ public class Http {
             list = BeatmapBean.generateList(result);
             // 储存beatmap id
             for (BeatmapBeanInfo aList : list) {
-                InsertRunnable insertRunnable = new InsertRunnable(aList);
-                Thread thread = new Thread(insertRunnable);
-                thread.start();
                 beatmapIdList.add(aList.getBeatmap_id());
                 beatmapSetIdList.add(aList.getBeatmapset_id());
                 fileMD5List.add(aList.getFile_md5());
@@ -146,18 +142,6 @@ public class Http {
         }
     }
 
-    private class InsertRunnable implements Runnable {
-        BeatmapBeanInfo beatmapBeanInfo;
-
-        public InsertRunnable(BeatmapBeanInfo beatmapBeanInfo) {
-            this.beatmapBeanInfo = beatmapBeanInfo;
-        }
-
-        @Override
-        public void run() {
-            BeatmapTable.insertBeatmap(beatmapBeanInfo);
-        }
-    }
 
     /**
      * 输出下载地址
@@ -260,7 +244,7 @@ public class Http {
      * @param url 地址
      * @return json数据
      */
-    private String httpGet(String url) {
+    public static String httpGet(String url) {
         CloseableHttpClient httpClient = HttpClients.createDefault();
         HttpGet httpGet = new HttpGet(url);
         try {

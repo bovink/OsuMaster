@@ -16,7 +16,7 @@ public class SqliteUtil {
         Connection connection = null;
         try {
             Class.forName("org.sqlite.JDBC");
-            connection = DriverManager.getConnection("jdbc:sqlite://D:/测试/test.db");
+            connection = DriverManager.getConnection("jdbc:sqlite://D:/测试/beatmap.db");
         } catch (Exception e) {
             System.err.println(e.getClass().getName() + ": " + e.getMessage());
             System.exit(0);
