@@ -4,7 +4,9 @@ import api.API;
 import bean.BeatmapBean;
 import org.json.JSONException;
 import database.BeatmapTable;
+import util.SqliteUtil;
 
+import java.sql.Connection;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -32,6 +34,7 @@ public class SQLMain {
     *
     */
     private static class BeatmapDatabase {
+        Connection connection = SqliteUtil.getConnection();
         /**
          * 开始时间
          */
@@ -69,7 +72,7 @@ public class SQLMain {
                 beatmaps = BeatmapBean.generateList(result);
                 // 遍历beatmap，如果数据库中不存在则插入数据库
                 for (BeatmapBean.BeatmapBeanInfo beatmap : beatmaps) {
-                    InsertRunnable insertRunnable = new InsertRunnable(beatmap);
+                    InsertRunnable insertRunnable = new InsertRunnable(connection, beatmap);
                     Thread thread = new Thread(insertRunnable);
                     thread.start();
                 }
@@ -97,16 +100,18 @@ public class SQLMain {
      */
     private static class InsertRunnable implements Runnable {
         BeatmapBean.BeatmapBeanInfo beatmapBeanInfo;
+        Connection connection;
 
-        InsertRunnable(BeatmapBean.BeatmapBeanInfo beatmapBeanInfo) {
+        InsertRunnable(Connection connection, BeatmapBean.BeatmapBeanInfo beatmapBeanInfo) {
             this.beatmapBeanInfo = beatmapBeanInfo;
+            this.connection = connection;
         }
 
         @Override
         public void run() {
             // 如果不存在该数据，则插入数据
-            if (!BeatmapTable.queryBeatmap(Integer.valueOf(beatmapBeanInfo.getBeatmap_id()))) {
-                BeatmapTable.insertBeatmap(beatmapBeanInfo);
+            if (!BeatmapTable.queryBeatmap(connection, Integer.valueOf(beatmapBeanInfo.getBeatmap_id()))) {
+                BeatmapTable.insertBeatmap(connection, beatmapBeanInfo);
             }
         }
     }
