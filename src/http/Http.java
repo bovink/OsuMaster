@@ -155,7 +155,7 @@ public class Http {
 
         @Override
         public void run() {
-            BeatmapTable.insertData(beatmapBeanInfo);
+            BeatmapTable.insertBeatmap(beatmapBeanInfo);
         }
     }
 
