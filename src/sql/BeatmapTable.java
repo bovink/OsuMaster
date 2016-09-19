@@ -55,6 +55,8 @@ public class BeatmapTable {
                         "MAX_COMBO INTEGER)";
                 statement.executeUpdate(sql);
             }
+
+            resultSet.close();
             statement.close();
             connection.close();
         } catch (SQLException e) {
@@ -62,7 +64,12 @@ public class BeatmapTable {
         }
     }
 
-    public static void insertData(BeatmapBean.BeatmapBeanInfo beatmapInfo) {
+    /**
+     * 插入beatmap信息
+     *
+     * @param beatmapInfo
+     */
+    public static void insertBeatmap(BeatmapBean.BeatmapBeanInfo beatmapInfo) {
         Connection connection = getConnection();
         Statement statement;
         try {
@@ -80,9 +87,8 @@ public class BeatmapTable {
                     beatmapInfo.getTitle() + "\"," + Integer.valueOf(beatmapInfo.getTotal_length()) + ",\"" + beatmapInfo.getVersion() + "\",\"" +
                     beatmapInfo.getFile_md5() + "\"," + Integer.valueOf(beatmapInfo.getMode()) + "," + Integer.valueOf(beatmapInfo.getFavourite_count()) + "," +
                     Integer.valueOf(beatmapInfo.getPlaycount()) + "," + Integer.valueOf(beatmapInfo.getPasscount()) + "," + Integer.valueOf(beatmapInfo.getMax_combo()) + ");";
-
-            System.out.println(sql);
             statement.executeUpdate(sql);
+
             statement.close();
             connection.close();
         } catch (SQLException e) {
@@ -90,5 +96,77 @@ public class BeatmapTable {
         }
     }
 
+    /**
+     * 查询BeatmapId为指定id的数据
+     *
+     * @param beatmapId 指定id
+     * @return 是否存在
+     */
+    public static boolean queryBeatmap(int beatmapId) {
+        Connection connection = getConnection();
+        Statement statement;
+
+        try {
+            statement = connection.createStatement();
+
+            String sql = "SELECT * FROM BEATMAPS WHERE BEATMAP_ID = " + beatmapId;
+            ResultSet resultSet = statement.executeQuery(sql);
+            if (resultSet.next()) {
+                System.out.println("TITLE =\t\t\t\t" + resultSet.getString("title"));
+                System.out.println("ARTIST=\t\t\t\t" + resultSet.getString("artist"));
+                return true;
+            } else {
+                System.out.println("不存在该数据");
+            }
+
+            resultSet.close();
+            statement.close();
+            connection.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+
+    /**
+     * 更新beatmapId为指定id的beatmap的approved为指定approved
+     *
+     * @param beatmapId 指定id
+     * @param approved  指定approved
+     */
+    public static void updateBeatmap(int beatmapId, int approved) {
+        Connection connection = getConnection();
+        Statement statement;
+        try {
+            statement = connection.createStatement();
+            String sql = "UPDATE BEATMAPS SET APPROVED = " + approved + " WHERE BEATMAP_ID = " + beatmapId;
+            statement.executeUpdate(sql);
+
+            statement.close();
+            connection.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 删除beatmapId为指定id的beatmap
+     * @param beatmapId 指定id
+     */
+    public static void deleteBeatmap(int beatmapId) {
+        Connection connection = getConnection();
+        Statement statement;
+        try {
+            statement = connection.createStatement();
+            String sql = "DELETE FROM BEATMAPS WHERE BEATMAP_ID = " + beatmapId;
+            statement.executeUpdate(sql);
+
+            statement.close();
+            connection.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 
 }

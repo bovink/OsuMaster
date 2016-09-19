@@ -8,8 +8,10 @@ import sql.BeatmapTable;
 public class TestSqlite {
 
     public static void main(String[] args) {
-        BeatmapTable.createTable();
-//        BeatmapTable.insertData();
+//        BeatmapTable.createTable();
+//        BeatmapTable.insertBeatmap();
+//        BeatmapTable.queryBeatmap(10000000);
+        BeatmapTable.deleteBeatmap(54899);
     }
 
 
