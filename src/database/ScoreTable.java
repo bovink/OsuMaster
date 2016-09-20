@@ -30,6 +30,7 @@ public class ScoreTable {
             if (!resultSet.next()) {
                 sql = "CREATE TABLE SCORE" +
                         "(ID INTEGER PRIMARY KEY AUTOINCREMENT," +
+                        "BEATMAP_ID INTEGER," +
                         "SCORE_ID INTEGER," +
                         "SCORE INTEGER," +
                         "USERNAME VARCHAR(50)," +
@@ -62,12 +63,13 @@ public class ScoreTable {
      *
      * @param scoreInfo 分数
      */
-    public static void insertScore(Connection connection, ScoreBean.ScoresBeanInfo scoreInfo) {
+    public static void insertScore(Connection connection, String beatmap_id, ScoreBean.ScoresBeanInfo scoreInfo) {
         Statement statement;
 
-        String sql = "INSERT INTO SCORE (SCORE_ID, SCORE, USERNAME, COUNT300, COUNT100, COUNT50, COUNTMISS, MAXCOMBO," +
+        String sql = "INSERT INTO SCORE (BEATMAP_ID, SCORE_ID, SCORE, USERNAME, COUNT300, COUNT100, COUNT50, COUNTMISS, MAXCOMBO," +
                 " COUNTKATU, COUNTGEKI, PERFECT, ENABLE_MODS, USER_ID, DATE, RANK, PP) " +
                 "VALUES (" +
+                Integer.valueOf(beatmap_id) + "," +
                 Long.valueOf(scoreInfo.getScore_id()) + "," +
                 Long.valueOf(scoreInfo.getScore()) + ",\"" +
                 scoreInfo.getUsername() + "\"," +

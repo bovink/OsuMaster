@@ -126,8 +126,10 @@ public class SQLMain {
         private void getBeatmapId() {
             Statement statement;
             try {
+                // 已经遍历到了1401
+                //  接下来从800000到881702
                 statement = beatmapConn.createStatement();
-                String sql = "SELECT * FROM BEATMAP WHERE APPROVED = 1 AND BEATMAP_ID > 20396 ORDER BY BEATMAP_ID";
+                String sql = "SELECT * FROM BEATMAP WHERE APPROVED = 1 AND BEATMAP_ID > 861310 ORDER BY BEATMAP_ID";
                 ResultSet resultSet = statement.executeQuery(sql);
                 while (resultSet.next()) {
                     requestJSON(resultSet.getString("beatmap_id"));
@@ -136,16 +138,18 @@ public class SQLMain {
 
                 statement.close();
                 beatmapConn.close();
-            } catch (SQLException | InterruptedException e) {
+            } catch (SQLException e) {
+                e.printStackTrace();
+            } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
 
 
-        private void requestJSON(String beatmapId) {
+        private void requestJSON(String beatmap_id) {
 
-            System.out.println(beatmapId);
-            String url = API.SCORES + "&b=" + beatmapId + "&limit=100";
+            System.out.println(beatmap_id);
+            String url = API.SCORES + "&b=" + beatmap_id + "&limit=100";
             String result = httpGet(url);
             // 某张图的分数
             ArrayList<ScoreBean.ScoresBeanInfo> scores;
@@ -154,7 +158,7 @@ public class SQLMain {
 
                 // 找出最大PP值
                 for (ScoreBean.ScoresBeanInfo score : scores) {
-                    InsertScoreRunnable insertScoreRunnable = new InsertScoreRunnable(scoreConn, score);
+                    InsertScoreRunnable insertScoreRunnable = new InsertScoreRunnable(scoreConn, score, beatmap_id);
                     Thread thread = new Thread(insertScoreRunnable);
                     thread.start();
 
@@ -192,17 +196,19 @@ public class SQLMain {
     private static class InsertScoreRunnable implements Runnable {
         ScoreBean.ScoresBeanInfo scoreBeanInfo;
         Connection connection;
+        String beatmap_id;
 
-        InsertScoreRunnable(Connection connection, ScoreBean.ScoresBeanInfo scoresBeanInfo) {
+        InsertScoreRunnable(Connection connection, ScoreBean.ScoresBeanInfo scoresBeanInfo, String beatmap_id) {
             this.scoreBeanInfo = scoresBeanInfo;
             this.connection = connection;
+            this.beatmap_id = beatmap_id;
         }
 
         @Override
         public void run() {
             // 如果不存在该数据，则插入数据
             if (!ScoreTable.queryScore(connection, Long.valueOf(scoreBeanInfo.getScore_id()))) {
-                ScoreTable.insertScore(connection, scoreBeanInfo);
+                ScoreTable.insertScore(connection, beatmap_id, scoreBeanInfo);
             }
         }
     }
