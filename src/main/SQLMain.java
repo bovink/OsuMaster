@@ -2,15 +2,24 @@ package main;
 
 import api.API;
 import bean.BeatmapBean;
-import org.json.JSONException;
+import bean.ScoreBean;
 import database.BeatmapTable;
+import database.ScoreTable;
+import org.json.JSONException;
 import util.SqliteUtil;
 
 import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Locale;
 
+import static bean.ScoreBean.generateList;
+import static database.BeatmapTable.queryBeatmap;
 import static http.Http.httpGet;
 
 /**
@@ -21,8 +30,11 @@ public class SQLMain {
 
     public static void main(String[] args) {
 
-        BeatmapDatabase beatmapDatabase = new BeatmapDatabase();
-        beatmapDatabase.startInsert();
+//        BeatmapDatabase beatmapDatabase = new BeatmapDatabase();
+//        beatmapDatabase.startInsert();
+        ScoreDatabase scoreDatabase = new ScoreDatabase();
+        scoreDatabase.startInsert();
+
     }
 
     /*
@@ -34,7 +46,7 @@ public class SQLMain {
     *
     */
     private static class BeatmapDatabase {
-        Connection connection = SqliteUtil.getConnection();
+        Connection connection = SqliteUtil.getConnection("beatmap.db");
         /**
          * 开始时间
          */
@@ -95,6 +107,64 @@ public class SQLMain {
 
     }
 
+    /*
+    * 1月
+    * 开始请求数据
+    * 判断本月是否结束，没有继续请求
+    * 插入数据库时判断
+    * 直到把1月的数据请求完
+    *
+    */
+    private static class ScoreDatabase {
+        Connection beatmapConn = SqliteUtil.getConnection("beatmap.db");
+        Connection scoreConn = SqliteUtil.getConnection("score.db");
+
+        private void startInsert() {
+            getBeatmapId();
+        }
+
+        private void getBeatmapId() {
+            Statement statement;
+            try {
+                statement = beatmapConn.createStatement();
+                String sql = "SELECT * FROM BEATMAP WHERE APPROVED = 1 AND BEATMAP_ID > 20396 ORDER BY BEATMAP_ID";
+                ResultSet resultSet = statement.executeQuery(sql);
+                while (resultSet.next()) {
+                    requestJSON(resultSet.getString("beatmap_id"));
+                    Thread.sleep(1000);
+                }
+
+                statement.close();
+                beatmapConn.close();
+            } catch (SQLException | InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+
+        private void requestJSON(String beatmapId) {
+
+            System.out.println(beatmapId);
+            String url = API.SCORES + "&b=" + beatmapId + "&limit=100";
+            String result = httpGet(url);
+            // 某张图的分数
+            ArrayList<ScoreBean.ScoresBeanInfo> scores;
+            try {
+                scores = generateList(result);
+
+                // 找出最大PP值
+                for (ScoreBean.ScoresBeanInfo score : scores) {
+                    InsertScoreRunnable insertScoreRunnable = new InsertScoreRunnable(scoreConn, score);
+                    Thread thread = new Thread(insertScoreRunnable);
+                    thread.start();
+
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     /**
      * 插入数据库 线程
      */
@@ -110,8 +180,29 @@ public class SQLMain {
         @Override
         public void run() {
             // 如果不存在该数据，则插入数据
-            if (!BeatmapTable.queryBeatmap(connection, Integer.valueOf(beatmapBeanInfo.getBeatmap_id()))) {
+            if (!queryBeatmap(connection, Integer.valueOf(beatmapBeanInfo.getBeatmap_id()))) {
                 BeatmapTable.insertBeatmap(connection, beatmapBeanInfo);
+            }
+        }
+    }
+
+    /**
+     * 插入分数数据库 线程
+     */
+    private static class InsertScoreRunnable implements Runnable {
+        ScoreBean.ScoresBeanInfo scoreBeanInfo;
+        Connection connection;
+
+        InsertScoreRunnable(Connection connection, ScoreBean.ScoresBeanInfo scoresBeanInfo) {
+            this.scoreBeanInfo = scoresBeanInfo;
+            this.connection = connection;
+        }
+
+        @Override
+        public void run() {
+            // 如果不存在该数据，则插入数据
+            if (!ScoreTable.queryScore(connection, Long.valueOf(scoreBeanInfo.getScore_id()))) {
+                ScoreTable.insertScore(connection, scoreBeanInfo);
             }
         }
     }

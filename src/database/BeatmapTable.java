@@ -14,12 +14,13 @@ import static util.SqliteUtil.getConnection;
  * 操作Beatmap表
  */
 public class BeatmapTable {
+    private static String databaseName = "beatmap.db";
 
     /**
      * 创建Beatmap表
      */
     public static void createTable() {
-        Connection connection = getConnection();
+        Connection connection = getConnection(databaseName);
         Statement statement;
         try {
             statement = connection.createStatement();
@@ -146,7 +147,7 @@ public class BeatmapTable {
      * @param approved  指定approved
      */
     public static void updateBeatmap(int beatmapId, int approved) {
-        Connection connection = getConnection();
+        Connection connection = getConnection(databaseName);
         Statement statement;
         try {
             statement = connection.createStatement();
@@ -166,7 +167,7 @@ public class BeatmapTable {
      * @param beatmapId 指定id
      */
     public static void deleteBeatmap(int beatmapId) {
-        Connection connection = getConnection();
+        Connection connection = getConnection(databaseName);
         Statement statement;
         try {
             statement = connection.createStatement();
