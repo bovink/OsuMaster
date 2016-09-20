@@ -3,6 +3,7 @@ package main;
 import api.API;
 import bean.BeatmapBean;
 import bean.ScoreBean;
+import com.google.gson.JsonSyntaxException;
 import database.BeatmapTable;
 import database.ScoreTable;
 import org.json.JSONException;
@@ -17,6 +18,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static bean.ScoreBean.generateList;
 import static database.BeatmapTable.queryBeatmap;
@@ -118,6 +120,8 @@ public class SQLMain {
     private static class ScoreDatabase {
         Connection beatmapConn = SqliteUtil.getConnection("beatmap.db");
         Connection scoreConn = SqliteUtil.getConnection("score.db");
+        ConcurrentHashMap<String, ArrayList<ScoreBean.ScoresBeanInfo>> scoreTotal = new ConcurrentHashMap<>();
+        ArrayList<String> beatmap_ids = new ArrayList<>();
 
         private void startInsert() {
             getBeatmapId();
@@ -126,21 +130,37 @@ public class SQLMain {
         private void getBeatmapId() {
             Statement statement;
             try {
-                // 已经遍历到了1401
-                //  接下来从800000到881702
+                // 分10次，1次十万
                 statement = beatmapConn.createStatement();
-                String sql = "SELECT * FROM BEATMAP WHERE APPROVED = 1 AND BEATMAP_ID > 861310 ORDER BY BEATMAP_ID";
+                String sql = "SELECT * FROM BEATMAP WHERE APPROVED = 1 AND BEATMAP_ID > 25000 AND BEATMAP_ID < 50000 ORDER BY BEATMAP_ID";
                 ResultSet resultSet = statement.executeQuery(sql);
                 while (resultSet.next()) {
-                    requestJSON(resultSet.getString("beatmap_id"));
-                    Thread.sleep(1000);
+                    // 将获取的beatmap_id全部保存到列表中25
+                    beatmap_ids.add(resultSet.getString("beatmap_id"));
+
+
                 }
+
+                int max = 100;
+                ArrayList<Thread> list = new ArrayList<>();
+                for (int i = 0; i < max; i++) {
+                    AddRunnable addRunnable = new AddRunnable(i, max, beatmap_ids);
+                    Thread thread = new Thread(addRunnable);
+                    list.add(thread);
+                    thread.start();
+                }
+                for (Thread thread : list) {
+                    try {
+                        thread.join();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                System.out.println("长度:" + scoreTotal.size());
 
                 statement.close();
                 beatmapConn.close();
             } catch (SQLException e) {
-                e.printStackTrace();
-            } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
@@ -148,7 +168,7 @@ public class SQLMain {
 
         private void requestJSON(String beatmap_id) {
 
-            System.out.println(beatmap_id);
+//            System.out.println(beatmap_id);
             String url = API.SCORES + "&b=" + beatmap_id + "&limit=100";
             String result = httpGet(url);
             // 某张图的分数
@@ -156,17 +176,57 @@ public class SQLMain {
             try {
                 scores = generateList(result);
 
+                scoreTotal.put(beatmap_id, scores);
+
                 // 找出最大PP值
                 for (ScoreBean.ScoresBeanInfo score : scores) {
-                    InsertScoreRunnable insertScoreRunnable = new InsertScoreRunnable(scoreConn, score, beatmap_id);
-                    Thread thread = new Thread(insertScoreRunnable);
-                    thread.start();
+//                    InsertScoreRunnable insertScoreRunnable = new InsertScoreRunnable(scoreConn, score, beatmap_id);
+//                    Thread thread = new Thread(insertScoreRunnable);
+//                    thread.start();
 
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
             }
         }
+
+        private class AddRunnable implements Runnable {
+            ArrayList<String> strings;
+            int index;
+            int max;
+
+            public AddRunnable(int index, int max, ArrayList<String> strings) {
+                this.index = index;
+                this.max = max;
+                this.strings = strings;
+            }
+
+            int tag = 0;
+            boolean success = true;
+
+            @Override
+            public void run() {
+//                System.out.println("min:" + strings.size() * index / max + "\tmax:" + strings.size() * (index + 1) / max);
+                for (int i = strings.size() * index / max; i < strings.size() * (index + 1) / max; i++) {
+                    try {
+                        // 当失败时，执行标签
+                        if (!success) {
+                            i = tag;
+                        }
+                        success = true;
+                        requestJSON(strings.get(i));
+
+                    } catch (JsonSyntaxException e) {
+                        success = false;
+                        tag = i;
+
+                    }
+                }
+
+            }
+
+        }
+
     }
 
     /**

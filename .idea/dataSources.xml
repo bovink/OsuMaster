@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="DataSourceManagerImpl" format="xml" hash="1955158920">
-    <data-source source="LOCAL" name="Sqlite (Xerial) - beatmap.db" uuid="38457088-85e5-46f9-ab0d-412a8e326bc5">
+  <component name="DataSourceManagerImpl" format="xml" hash="1943225878">
+    <data-source source="LOCAL" name="Sqlite (Xerial) - beatmap.db" uuid="a53da316-9383-4449-a1fd-5745439135a3">
       <driver-ref>sqlite.xerial</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.sqlite.JDBC</jdbc-driver>
-      <jdbc-url>jdbc:sqlite:D:/测试/beatmap.db</jdbc-url>
+      <jdbc-url>jdbc:sqlite:G:/osu/beatmap.db</jdbc-url>
     </data-source>
   </component>
 </project>
