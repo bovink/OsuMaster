@@ -21,6 +21,7 @@ public class ScoreBean {
     }
 
     public static class ScoresBeanInfo {
+        private String score_id;
         private String score;
         private String username;
         private String count300;
@@ -37,100 +38,12 @@ public class ScoreBean {
         private String rank;
         private String pp;
 
-        public String getCount100() {
-            return count100;
+        public String getScore_id() {
+            return score_id;
         }
 
-        public void setCount100(String count100) {
-            this.count100 = count100;
-        }
-
-        public String getCount300() {
-            return count300;
-        }
-
-        public void setCount300(String count300) {
-            this.count300 = count300;
-        }
-
-        public String getCount50() {
-            return count50;
-        }
-
-        public void setCount50(String count50) {
-            this.count50 = count50;
-        }
-
-        public String getCountgeki() {
-            return countgeki;
-        }
-
-        public void setCountgeki(String countgeki) {
-            this.countgeki = countgeki;
-        }
-
-        public String getCountkatu() {
-            return countkatu;
-        }
-
-        public void setCountkatu(String countkatu) {
-            this.countkatu = countkatu;
-        }
-
-        public String getCountmiss() {
-            return countmiss;
-        }
-
-        public void setCountmiss(String countmiss) {
-            this.countmiss = countmiss;
-        }
-
-        public String getDate() {
-            return date;
-        }
-
-        public void setDate(String date) {
-            this.date = date;
-        }
-
-        public String getEnabled_mods() {
-            return enabled_mods;
-        }
-
-        public void setEnabled_mods(String enabled_mods) {
-            this.enabled_mods = enabled_mods;
-        }
-
-        public String getMaxcombo() {
-            return maxcombo;
-        }
-
-        public void setMaxcombo(String maxcombo) {
-            this.maxcombo = maxcombo;
-        }
-
-        public String getPerfect() {
-            return perfect;
-        }
-
-        public void setPerfect(String perfect) {
-            this.perfect = perfect;
-        }
-
-        public String getPp() {
-            return pp;
-        }
-
-        public void setPp(String pp) {
-            this.pp = pp;
-        }
-
-        public String getRank() {
-            return rank;
-        }
-
-        public void setRank(String rank) {
-            this.rank = rank;
+        public void setScore_id(String score_id) {
+            this.score_id = score_id;
         }
 
         public String getScore() {
@@ -141,6 +54,86 @@ public class ScoreBean {
             this.score = score;
         }
 
+        public String getUsername() {
+            return username;
+        }
+
+        public void setUsername(String username) {
+            this.username = username;
+        }
+
+        public String getCount300() {
+            return count300;
+        }
+
+        public void setCount300(String count300) {
+            this.count300 = count300;
+        }
+
+        public String getCount100() {
+            return count100;
+        }
+
+        public void setCount100(String count100) {
+            this.count100 = count100;
+        }
+
+        public String getCount50() {
+            return count50;
+        }
+
+        public void setCount50(String count50) {
+            this.count50 = count50;
+        }
+
+        public String getCountmiss() {
+            return countmiss;
+        }
+
+        public void setCountmiss(String countmiss) {
+            this.countmiss = countmiss;
+        }
+
+        public String getMaxcombo() {
+            return maxcombo;
+        }
+
+        public void setMaxcombo(String maxcombo) {
+            this.maxcombo = maxcombo;
+        }
+
+        public String getCountkatu() {
+            return countkatu;
+        }
+
+        public void setCountkatu(String countkatu) {
+            this.countkatu = countkatu;
+        }
+
+        public String getCountgeki() {
+            return countgeki;
+        }
+
+        public void setCountgeki(String countgeki) {
+            this.countgeki = countgeki;
+        }
+
+        public String getPerfect() {
+            return perfect;
+        }
+
+        public void setPerfect(String perfect) {
+            this.perfect = perfect;
+        }
+
+        public String getEnabled_mods() {
+            return enabled_mods;
+        }
+
+        public void setEnabled_mods(String enabled_mods) {
+            this.enabled_mods = enabled_mods;
+        }
+
         public String getUser_id() {
             return user_id;
         }
@@ -149,12 +142,28 @@ public class ScoreBean {
             this.user_id = user_id;
         }
 
-        public String getUsername() {
-            return username;
+        public String getDate() {
+            return date;
         }
 
-        public void setUsername(String username) {
-            this.username = username;
+        public void setDate(String date) {
+            this.date = date;
+        }
+
+        public String getRank() {
+            return rank;
+        }
+
+        public void setRank(String rank) {
+            this.rank = rank;
+        }
+
+        public String getPp() {
+            return pp;
+        }
+
+        public void setPp(String pp) {
+            this.pp = pp;
         }
     }
 
