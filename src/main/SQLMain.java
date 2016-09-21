@@ -13,7 +13,8 @@ public class SQLMain {
 //        BeatmapDatabase beatmapDatabase = new BeatmapDatabase();
 //        beatmapDatabase.startInsert();
         ScoreDatabase scoreDatabase = new ScoreDatabase();
-        scoreDatabase.startDelete();
+        scoreDatabase.startInsert();
+//        scoreDatabase.startDelete();
 
     }
 
