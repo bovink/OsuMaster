@@ -122,4 +122,20 @@ public class ScoreTable {
         }
         return false;
     }
+
+    public static void delete(Connection connection, long scoreId) {
+        Statement statement;
+
+        try {
+            statement = connection.createStatement();
+            String sql = "DELETE FROM SCORE WHERE SCORE_ID = " + scoreId;
+
+            statement.executeUpdate(sql);
+            statement.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+    }
+
 }
