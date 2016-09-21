@@ -40,6 +40,53 @@ public class ScoreDatabase {
         getBeatmapId("3000", "4000");
     }
 
+    /**
+     * 删掉多余的分数，每张图只留前50名
+     */
+    public void startDelete() {
+        getBeatmap();
+    }
+
+    private void getBeatmap() {
+        Statement statement;
+
+        try {
+            statement = beatmapConn.createStatement();
+            // 获取所有APPROVED了的图，按BEATMAP_ID排序
+            String sql = "SELECT * FROM BEATMAP WHERE APPROVED = 1  ORDER BY BEATMAP_ID ASC";
+            ResultSet resultSet = statement.executeQuery(sql);
+            while (resultSet.next()) {
+                String beatmap_id = resultSet.getString("beatmap_id");
+                deleteScore(beatmap_id);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void deleteScore(String beatmap_id) {
+        Statement statement;
+        try {
+            statement = scoreConn.createStatement();
+            // 获取该图的分数，按PP排名
+            String sql = "SELECT * FROM SCORE WHERE BEATMAP_ID = " + beatmap_id + " ORDER BY SCORE DESC";
+            ResultSet scoreResultSet = statement.executeQuery(sql);
+            int index = 0;
+            while (scoreResultSet.next()) {
+                index += 1;
+                String scoreId = scoreResultSet.getString("score_id");
+                // 低于50名的删掉
+                if (index > 50) {
+                    ScoreTable.delete(scoreConn, Long.valueOf(scoreId));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+
+    }
+
     private void getBeatmapId(String start, String end) {
         System.out.println(start + " and " + end);
         Statement statement;
@@ -160,7 +207,7 @@ public class ScoreDatabase {
     /**
      * 插入分数数据库 线程
      */
-    private  class InsertScoreRunnable implements Runnable {
+    private class InsertScoreRunnable implements Runnable {
         ScoreBean.ScoresBeanInfo scoreBeanInfo;
         Connection connection;
         String beatmap_id;
