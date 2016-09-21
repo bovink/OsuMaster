@@ -33,12 +33,24 @@ public class ScoreDatabase {
     */
     Connection beatmapConn = SqliteUtil.getConnection("beatmap.db");
     Connection scoreConn = SqliteUtil.getConnection("score.db");
+    Connection connection;
     ConcurrentHashMap<String, ArrayList<ScoreBean.ScoresBeanInfo>> scoreTotal = new ConcurrentHashMap<>();
     ArrayList<String> beatmap_ids = new ArrayList<>();
 
-    public void startInsert() {
-        getBeatmapId("3000", "4000");
+    public ScoreDatabase() {
+        try {
+            connection = SqliteUtil.getMySQLConn();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
     }
+
+    public void startInsert() {
+        getBeatmapId("1000", "2000");
+    }
+
 
     /**
      * 删掉多余的分数，每张图只留前50名
@@ -100,8 +112,9 @@ public class ScoreDatabase {
                 beatmap_ids.add(resultSet.getString("beatmap_id"));
             }
 
+
             // 开启线程，将获取的beatmap_ids分批请求数据，并插入数据库
-            int max = 100;
+            int max = 10;
             ArrayList<Thread> list = new ArrayList<>();
             for (int i = 0; i < max; i++) {
                 AddRunnable addRunnable = new AddRunnable(i, max, beatmap_ids);
@@ -109,31 +122,31 @@ public class ScoreDatabase {
                 list.add(thread);
                 thread.start();
             }
-
-            for (Thread thread : list) {
-                try {
-                    thread.join();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            System.out.println("长度:" + scoreTotal.size());
-
-            InsertScoreRunnable insertScoreRunnable = new InsertScoreRunnable(scoreConn, scoreTotal);
-            Thread thread = new Thread(insertScoreRunnable);
-            thread.start();
-
-            try {
-                thread.join();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            scoreTotal.clear();
-            System.out.println("end");
-            String newStart = String.valueOf(Long.valueOf(start) + 1000);
-            String newEnd = String.valueOf(Long.valueOf(end) + 1000);
-            getBeatmapId(newStart, newEnd);
+//
+//            for (Thread thread : list) {
+//                try {
+//                    thread.join();
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//
+//            System.out.println("长度:" + scoreTotal.size());
+//
+//            InsertScoreRunnable insertScoreRunnable = new InsertScoreRunnable(scoreConn, scoreTotal);
+//            Thread thread = new Thread(insertScoreRunnable);
+//            thread.start();
+//
+//            try {
+//                thread.join();
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+//            scoreTotal.clear();
+//            System.out.println("end");
+//            String newStart = String.valueOf(Long.valueOf(start) + 1000);
+//            String newEnd = String.valueOf(Long.valueOf(end) + 1000);
+//            getBeatmapId(newStart, newEnd);
 
             statement.close();
             beatmapConn.close();
@@ -141,7 +154,6 @@ public class ScoreDatabase {
             e.printStackTrace();
         }
     }
-
 
     private void requestJSON(String beatmap_id) {
 
@@ -152,11 +164,20 @@ public class ScoreDatabase {
         try {
             scores = generateList(result);
 
-            scoreTotal.put(beatmap_id, scores);
+//            scoreTotal.put(beatmap_id, scores);
             System.out.println(beatmap_id);
 
             // 找出最大PP值
             for (ScoreBean.ScoresBeanInfo score : scores) {
+
+                Thread thread = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        ScoreTable.insertScore(connection, beatmap_id, score);
+
+                    }
+                });
+                thread.start();
 //                    InsertScoreRunnable insertScoreRunnable = new InsertScoreRunnable(scoreConn, score, beatmap_id);
 //                    Thread thread = new Thread(insertScoreRunnable);
 //                    thread.start();
