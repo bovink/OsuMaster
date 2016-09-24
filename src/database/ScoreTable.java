@@ -66,7 +66,13 @@ public class ScoreTable {
     public static void insertScore(Connection connection, String beatmap_id, ScoreBean.ScoresBeanInfo scoreInfo) {
         Statement statement;
 
-        String sql = "INSERT INTO SCORE (BEATMAP_ID, SCORE_ID, SCORE, USERNAME, COUNT300, COUNT100, COUNT50, COUNTMISS, MAXCOMBO," +
+        String pp;
+        if (scoreInfo.getPp() == null) {
+            pp = "0";
+        } else {
+            pp = scoreInfo.getPp();
+        }
+        String sql = "INSERT INTO SCORE2 (BEATMAP_ID, SCORE_ID, SCORE, USERNAME, COUNT300, COUNT100, COUNT50, COUNTMISS, MAXCOMBO," +
                 " COUNTKATU, COUNTGEKI, PERFECT, ENABLE_MODS, USER_ID, DATE, RANK, PP) " +
                 "VALUES (" +
                 Integer.valueOf(beatmap_id) + "," +
@@ -85,7 +91,7 @@ public class ScoreTable {
                 Long.valueOf(scoreInfo.getUser_id()) + ",\"" +
                 scoreInfo.getDate() + "\",\"" +
                 scoreInfo.getRank() + "\"," +
-                Double.valueOf(scoreInfo.getPp()) + ");";
+                Double.valueOf(pp) + ");";
         try {
             statement = connection.createStatement();
             statement.executeUpdate(sql);
