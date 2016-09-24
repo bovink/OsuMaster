@@ -48,8 +48,9 @@ public class ScoreDatabase {
     }
 
     public void startInsert() {
+        // 409150
         // 26000 27000
-        getBeatmapId("9000", "10000");
+        getBeatmapId("30000", "31000");
     }
 
 
@@ -102,7 +103,7 @@ public class ScoreDatabase {
 
     private void getBeatmapId(String start, String end) {
         int maxId = Integer.valueOf(start);
-        if (maxId > 49500) {
+        if (maxId == 40000) {
             return;
         }
         System.out.println(start + " and " + end);
@@ -110,7 +111,7 @@ public class ScoreDatabase {
         try {
             // 分10次，1次十万
             statement = beatmapConn.createStatement();
-            String sql = "SELECT * FROM BEATMAP WHERE APPROVED = 1 AND ID > " + start + " AND ID < " + end + " ORDER BY BEATMAP_ID";
+            String sql = "SELECT * FROM BEATMAP WHERE APPROVED = 1 AND ID > " + start + " AND ID <= " + end + " ORDER BY BEATMAP_ID";
             System.out.println(sql);
             ResultSet resultSet = statement.executeQuery(sql);
             while (resultSet.next()) {
@@ -262,7 +263,7 @@ public class ScoreDatabase {
         }
     }
 
-    private class InRunnable implements Runnable{
+    private class InRunnable implements Runnable {
         String beatmap_id;
         Connection connection;
         ArrayList<ScoreBean.ScoresBeanInfo> scores;
@@ -278,7 +279,12 @@ public class ScoreDatabase {
 
             for (ScoreBean.ScoresBeanInfo score : scores) {
 
-                ScoreTable.insertScore(connection, beatmap_id, score);
+                try {
+
+                    ScoreTable.insertScore(connection, beatmap_id, score);
+                } catch (NullPointerException e) {
+                    System.out.println("有问题：" + beatmap_id);
+                }
 //                            //如果不存在该数据，则插入数据
 //                            if (!ScoreTable.queryScore(connection, Long.valueOf(score.getScore_id()))) {
 //                            }
