@@ -51,7 +51,7 @@ public class Generate {
     }
 
 
-    private String collectionName = "None 160-170";
+    private String collectionName = "HardRock 160-170";
     private String min = "160";
     private String max = "170";
     private int index = 1;
@@ -61,19 +61,33 @@ public class Generate {
      */
     public void getBeatmapScore() {
         String tableName;
-        if (index == 1) {
-            tableName = "score1";
-        } else if (index == 2) {
-            tableName = "score2";
-        } else {
-            return;
+        switch (index) {
+            case 1:
+                tableName = "score1";
+                break;
+            case 2:
+                tableName = "score2";
+                break;
+            case 3:
+                tableName = "score3";
+                break;
+            case 4:
+                tableName = "score4";
+                break;
+            case 5:
+                tableName = "score5";
+                break;
+            default:
+                return;
         }
         Statement statement;
 
         try {
             statement = mySQLconn.createStatement();
             // 获取所有APPROVED了的图，按BEATMAP_ID排序
-            String sql = "SELECT * FROM " + tableName + " WHERE pp >= " + min + " AND  pp <= " + max + " AND perfect = 1 AND  enable_mods = 0 ORDER BY beatmap_id ASC";
+            String sql = "SELECT beatmap_id FROM " + tableName + " WHERE pp >= " + min + " AND  pp <= " + max + " AND" +
+                    " perfect = 1 AND enable_mods = 16 AND maxcombo <= 800 ORDER BY beatmap_id ASC";
+            System.out.println(sql);
             ResultSet resultSet = statement.executeQuery(sql);
             String previous = "";
             while (resultSet.next()) {
@@ -87,10 +101,10 @@ public class Generate {
             e.printStackTrace();
         }
 
-        if (index == 1) {
-            index = 2;
+        if (index != 5) {
+            index += 1;
             getBeatmapScore();
-        } else if (index == 2) {
+        } else if (index == 5) {
 
             encode();
             decode();
@@ -106,7 +120,7 @@ public class Generate {
         try {
             statement = beatmapConn.createStatement();
             // 获取所有APPROVED了的图，按BEATMAP_ID排序
-            String sql = "SELECT * FROM BEATMAP WHERE BEATMAP_ID = " + beatmap_id;
+            String sql = "SELECT FILE_MD5 FROM BEATMAP WHERE BEATMAP_ID = " + beatmap_id;
             ResultSet resultSet = statement.executeQuery(sql);
             while (resultSet.next()) {
                 String md5 = resultSet.getString("file_md5");

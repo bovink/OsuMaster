@@ -50,9 +50,64 @@ public class ScoreDatabase {
     public void startInsert() {
         // 409150
         // 26000 27000
-        getBeatmapId("30000", "31000");
+        getBeatmapId("40000", "41000");
     }
 
+    private void query(String start, String end) {
+        Statement statement;
+
+        try {
+            statement = beatmapConn.createStatement();
+            // 获取所有APPROVED了的图，按BEATMAP_ID排序
+            String sql = "SELECT * FROM BEATMAP WHERE APPROVED = 1 AND ID > " + start + " AND ID <= " + end + " ORDER BY BEATMAP_ID ASC";
+            ResultSet resultSet = statement.executeQuery(sql);
+            while (resultSet.next()) {
+                String beatmap_id = resultSet.getString("beatmap_id");
+                CheckRunnable checkRunnable = new CheckRunnable(beatmap_id);
+                Thread thread = new Thread(checkRunnable);
+                thread.start();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private class CheckRunnable implements Runnable {
+        String beatmap_id;
+
+        public CheckRunnable(String beatmap_id) {
+            this.beatmap_id = beatmap_id;
+        }
+
+        @Override
+        public void run() {
+            check();
+//            System.out.println("a");
+
+        }
+    }
+
+
+    private void check() {
+        Statement statement;
+        int index;
+
+        try {
+            statement = mySQLconn.createStatement();
+            // 获取所有APPROVED了的图，按BEATMAP_ID排序
+            String sql = "SELECT id FROM score5";
+            ResultSet resultSet = statement.executeQuery(sql);
+            boolean b = resultSet.last();
+            if (b) {
+                index = resultSet.getRow();
+                System.out.println("插入条数:" + index);
+            }
+            statement.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+    }
 
     /**
      * 删掉多余的分数，每张图只留前50名
@@ -103,7 +158,7 @@ public class ScoreDatabase {
 
     private void getBeatmapId(String start, String end) {
         int maxId = Integer.valueOf(start);
-        if (maxId == 40000) {
+        if (maxId == 50000) {
             return;
         }
         System.out.println(start + " and " + end);
@@ -111,7 +166,7 @@ public class ScoreDatabase {
         try {
             // 分10次，1次十万
             statement = beatmapConn.createStatement();
-            String sql = "SELECT * FROM BEATMAP WHERE APPROVED = 1 AND ID > " + start + " AND ID <= " + end + " ORDER BY BEATMAP_ID";
+            String sql = "SELECT BEATMAP_ID FROM BEATMAP WHERE ID > " + start + " AND ID <= " + end;
             System.out.println(sql);
             ResultSet resultSet = statement.executeQuery(sql);
             while (resultSet.next()) {
@@ -149,12 +204,13 @@ public class ScoreDatabase {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
+            check();
             System.out.println("end");
             String newStart = String.valueOf(Long.valueOf(start) + 1000);
             String newEnd = String.valueOf(Long.valueOf(end) + 1000);
             getBeatmapId(newStart, newEnd);
 
-            statement.close();
+//            statement.close();
             beatmapConn.close();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -169,9 +225,12 @@ public class ScoreDatabase {
         ArrayList<ScoreBean.ScoresBeanInfo> scores;
         try {
             scores = generateList(result);
+            if (scores.size() != 50) {
+                System.out.println("不足50:" + beatmap_id);
+            }
 
             scoreTotal.put(beatmap_id, scores);
-            System.out.println(beatmap_id);
+            System.out.println("beatmap_id:" + beatmap_id + " size:" + scoreTotal.size());
 
         } catch (JSONException e) {
             e.printStackTrace();

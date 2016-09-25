@@ -72,7 +72,7 @@ public class ScoreTable {
         } else {
             pp = scoreInfo.getPp();
         }
-        String sql = "INSERT INTO SCORE2 (BEATMAP_ID, SCORE_ID, SCORE, USERNAME, COUNT300, COUNT100, COUNT50, COUNTMISS, MAXCOMBO," +
+        String sql = "INSERT INTO SCORE5 (BEATMAP_ID, SCORE_ID, SCORE, USERNAME, COUNT300, COUNT100, COUNT50, COUNTMISS, MAXCOMBO," +
                 " COUNTKATU, COUNTGEKI, PERFECT, ENABLE_MODS, USER_ID, DATE, RANK, PP) " +
                 "VALUES (" +
                 Integer.valueOf(beatmap_id) + "," +
