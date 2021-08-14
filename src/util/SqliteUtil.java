@@ -26,7 +26,7 @@ public class SqliteUtil {
     }
 
     public static Connection getMySQLConn() throws SQLException, ClassNotFoundException {
-        Class.forName("com.mysql.jdbc.Driver");
+        Class.forName("com.mysql.cj.jdbc.Driver");
         String serverName = "localhost";
         String database = "world";
         String url = "jdbc:mysql://" + serverName + "/" + database;
